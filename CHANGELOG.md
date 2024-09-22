@@ -1,5 +1,11 @@
 # registrie
 
+## 0.7.1
+
+### Patch Changes
+
+- eb8e594: Check ci
+
 ## 0.7.0
 
 ### Minor Changes
