@@ -17,8 +17,7 @@
     "build": "tsup ./src/registrie.ts --format cjs,esm --dts --minify",
     "lint": "eslint",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "publish": "changeset publish --access public",
-    "release": "npm run build && npm run lint && npm run publish"
+    "release": "npm run build && npm run lint && changeset publish --access public"
   },
   "keywords": [],
   "author": "Higuma Soft",
