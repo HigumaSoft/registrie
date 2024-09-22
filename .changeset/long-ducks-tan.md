@@ -1,5 +1,0 @@
----
-'registrie': patch
----
-
-Fixed CI

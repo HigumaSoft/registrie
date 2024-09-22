@@ -1,5 +1,11 @@
 # registrie
 
+## 0.7.2
+
+### Patch Changes
+
+- 32dbe40: Fixed CI
+
 ## 0.7.1
 
 ### Patch Changes
