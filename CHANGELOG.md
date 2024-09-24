@@ -1,5 +1,13 @@
 # registrie
 
+## 0.8.0
+
+### Minor Changes
+
+- f3e1aea: - Added deletion functionality for key:value Registrie
+  - Added tests for key:value Registrie
+  - fixed package output files
+
 ## 0.7.2
 
 ### Patch Changes
