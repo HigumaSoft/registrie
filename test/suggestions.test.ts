@@ -89,8 +89,9 @@ describe('Suggestions test', () => {
         'function',
         'number string'
       ];
+      console.log(result);
 
-      expect(result.sort()).toEqual(expectedEntries.sort());
+      expect(result).toEqual(expectedEntries.sort());
     });
 
     it('should return ["array", "any"] for "a"', () => {

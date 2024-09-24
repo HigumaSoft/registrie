@@ -12,6 +12,7 @@ export function Registrie<T>(
   register: (key: string, value: T) => void;
   query: (key: string) => T | undefined;
   candidate: (key: string) => string[];
+  erase: (key: string) => void;
 };
 
 // If entryKey is provided, T must be an object, and register takes only a value of T
@@ -22,6 +23,7 @@ export function Registrie<T extends object>(
   register: (value: T) => void;
   query: (key: string) => T | undefined;
   candidate: (key: string) => T[typeof entryKey][];
+  erase: (key: string) => void;
 };
 
 // Implementation of the function, handling both cases
@@ -94,6 +96,35 @@ export function Registrie<T>(entryKey?: keyof T, childrenEntryKey?: keyof T) {
     node.empty = false;
   }
 
+  function remove(key: string): void {
+    if (!key) return;
+    let node = root;
+    const stack: Array<[RegistrieNode<T>, string]> = [];
+    for (const char of key) {
+      if (!node.children[char]) return;
+      node = node.children[char]!;
+      stack.push([node, char]);
+    }
+
+    if (!node.entry) return;
+    node.entry = undefined;
+
+    while (stack.length > 0) {
+      const [parent, char] = stack.pop()!;
+      const child = parent.children[char];
+      if (child && Object.keys(child.children).length === 0 && !child.entry) {
+        delete parent.children[char];
+      } else {
+        break; // matched with a non-leaf node
+      }
+    }
+  }
+
+  function removeT(key: string): void {
+    const node = queryNode(key);
+    if (!node || !node.entry) return;
+  }
+
   function queryNode(key: string): RegistrieNode<T> | undefined {
     let node: RegistrieNode<T> = root;
     for (const char of key) {
@@ -157,6 +188,7 @@ export function Registrie<T>(entryKey?: keyof T, childrenEntryKey?: keyof T) {
   return {
     register: _entryKey ? addEntryT : addEntry,
     candidate: _entryKey ? candidateT : candidate,
+    erase: _entryKey ? removeT : remove,
     query: query
   };
 }

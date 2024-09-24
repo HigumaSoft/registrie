@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "vitest",
-    "build": "tsup ./src/registrie.ts --format cjs,esm --dts --minify",
+    "build": "tsup ./src/**/*.ts --format cjs,esm --dts --minify",
     "lint": "eslint",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "release": "npm run build && npm run lint && changeset publish --access public"
