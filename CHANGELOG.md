@@ -1,5 +1,11 @@
 # registrie
 
+## 0.8.3
+
+### Patch Changes
+
+- 9a73b18: Updated package
+
 ## 0.8.2
 
 ### Patch Changes
