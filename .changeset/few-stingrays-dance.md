@@ -1,0 +1,5 @@
+---
+'registrie': patch
+---
+
+Update README
