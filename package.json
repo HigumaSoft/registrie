@@ -19,11 +19,18 @@
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "release": "npm run build && npm run lint && changeset publish --access public"
   },
-  "keywords": [],
+  "keywords": ["trie", "registry", "typescript", "registrie", "javascript"],
   "author": "Higuma Soft",
-  "homepage": "https://github.com/HigumaSoft/registrie#readme",
+  "homepage": "https://www.npmjs.com/package/registrie",
+  "bugs": {
+    "url": "https://github.com/HigumaSoft/registrie/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HigumaSoft/registrie.git"
+  },
   "license": "MIT",
-  "description": "",
+  "description": "A flexible trie-based registry for storing and querying entries with optional hierarchical keys. `Registrie` supports both simple key-value stores and complex nested structures, making it a versatile tool for various applications.",
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
     "@eslint/js": "^9.10.0",
