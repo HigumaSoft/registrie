@@ -1,5 +1,16 @@
 # registrie
 
+## 0.8.1
+
+### Patch Changes
+
+- b52aba5: Add readme
+
+  - Fixed the object children check, made it optional.
+  - Added JSDoc to the returned methods (closures).
+  - Added functionality to store objects as mutable or immutable.
+  - Added a README draft.
+
 ## 0.8.0
 
 ### Minor Changes
