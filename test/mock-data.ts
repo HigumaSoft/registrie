@@ -5,10 +5,10 @@ export type EntryObject = BaseObject & {
   usage: string;
 };
 export type EntryObjectWithChildren = EntryObject & {
-  subCommands: EntryObjectWithChildren[];
+  subCommands?: EntryObjectWithChildren[];
 };
 export type EntryObjectWithInverseChildren = EntryObject & {
-  subCommands: string[];
+  subCommands?: string[];
 };
 export type ArrayType = string[];
 export type NumberType = number;
@@ -32,6 +32,10 @@ export const mockEntryObjectWithChildren: EntryObjectWithChildren = {
     { name: 'Child Object 2', usage: 'child-key-2', subCommands: [] }
   ]
 };
+export const mockEntryObjectWithoutChildren: EntryObjectWithChildren = {
+  name: 'Parent Object without children',
+  usage: 'parent-key'
+};
 export const mockEntryObjectWithInverseChildren: EntryObjectWithInverseChildren =
   {
     name: 'Parent Object',
@@ -46,7 +50,7 @@ export const mockAnyType: AnyType = { name: 'Any Object' };
 export const mockUndefinedType: UndefinedType = undefined;
 export const mockNullType: NullType = null;
 export const mockFunctionType: FunctionType = () => 'result';
-export const mockNumberStringType: StringType = "42";
+export const mockNumberStringType: StringType = '42';
 
 export const mockDataWithChildren: EntryObjectWithChildren[] = [
   {

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Registrie } from '../src/registrie';
+import { BasicRegistrie, Registrie } from '../src/registrie';
 import { mockDataAny } from './mock-data';
 
 describe('Query method tests', () => {
   describe('Test for Registrie with any data type', () => {
-    let registryWithAny: ReturnType<typeof Registrie>;
+    let registryWithAny: BasicRegistrie;
 
     beforeEach(() => {
       registryWithAny = Registrie();

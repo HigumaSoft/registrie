@@ -66,10 +66,10 @@ describe('Suggestions test', () => {
 
   // TODO decide what to do with spaces in keys
   describe('Test for non-typed Registrie', () => {
-    let registryWithAny: ReturnType<typeof Registrie>;
+    let registryWithAny: ReturnType<typeof Registrie<any>>;
 
     beforeEach(() => {
-      registryWithAny = Registrie();
+      registryWithAny = Registrie<any>();
       Object.entries(mockDataAny).forEach(([key, value]) =>
         registryWithAny.register(key, value)
       );

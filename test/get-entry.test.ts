@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'; // or 'jest'
-import { Registrie } from '../src/registrie'; // Adjust the import to your file structure
+import { BasicRegistrie, NestedRegistrie, Registrie } from '../src/registrie'; // Adjust the import to your file structure
 import {
   mockDataWithChildren,
   mockDataAny,
@@ -9,9 +9,7 @@ import {
 describe('Query method tests', () => {
   // Test for mockDataWithChildren
   describe('Test for Typed Registrie by object keys', () => {
-    let registryWithChildren: ReturnType<
-      typeof Registrie<EntryObjectWithChildren>
-    >;
+    let registryWithChildren: NestedRegistrie<EntryObjectWithChildren>;
 
     beforeEach(() => {
       registryWithChildren = Registrie<EntryObjectWithChildren>(
@@ -71,7 +69,7 @@ describe('Query method tests', () => {
 
   // Test for mockDataAny
   describe('Test for Registrie with any data type', () => {
-    let registryWithAny: ReturnType<typeof Registrie>;
+    let registryWithAny: BasicRegistrie;
 
     beforeEach(() => {
       registryWithAny = Registrie();
