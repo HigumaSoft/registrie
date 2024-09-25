@@ -1,5 +1,11 @@
 # registrie
 
+## 0.8.2
+
+### Patch Changes
+
+- 48ad850: Update README
+
 ## 0.8.1
 
 ### Patch Changes
