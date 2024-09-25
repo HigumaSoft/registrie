@@ -1,5 +1,0 @@
----
-'registrie': patch
----
-
-Updated package
