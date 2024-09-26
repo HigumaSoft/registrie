@@ -1,9 +1,5 @@
 <div align="center">
-
-<div style="position: relative; text-align: center; display: inline-block; padding-top:60px">
-  <img src="./assets/logo.png" alt="Registrie Logo" style="position: absolute; width: 105px; left: 60; top: 80%; transform: translateY(-100%); z-index:-1" />
-  <h1 style="display: inline-block;  font-size: 3em">RegisTrie</h1>
-</div>
+  <img src="./assets/logotype.png" alt="Registrie Logo">
 
 [![npm version](https://img.shields.io/npm/v/registrie.svg)](https://www.npmjs.com/package/registrie)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
