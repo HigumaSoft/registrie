@@ -1,5 +1,0 @@
----
-'registrie': patch
----
-
-Removed logo
