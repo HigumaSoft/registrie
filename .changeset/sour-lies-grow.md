@@ -1,5 +1,0 @@
----
-'registrie': minor
----
-
-Update README

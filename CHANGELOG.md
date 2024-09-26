@@ -1,5 +1,11 @@
 # registrie
 
+## 0.9.0
+
+### Minor Changes
+
+- df744be: Update README
+
 ## 0.8.4
 
 ### Patch Changes
