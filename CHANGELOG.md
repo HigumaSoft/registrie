@@ -1,5 +1,11 @@
 # registrie
 
+## 0.9.1
+
+### Patch Changes
+
+- d05920a: Removed logo
+
 ## 0.9.0
 
 ### Minor Changes
