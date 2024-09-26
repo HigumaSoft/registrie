@@ -1,5 +1,11 @@
 # registrie
 
+## 0.8.4
+
+### Patch Changes
+
+- 1d2aead: Fixed package files
+
 ## 0.8.3
 
 ### Patch Changes
