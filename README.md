@@ -1,4 +1,13 @@
-# Registrie
+<div align="center">
+
+<div style="position: relative; text-align: center; display: inline-block; padding-top:60px">
+  <img src="./assets/logo.png" alt="Registrie Logo" style="position: absolute; width: 105px; left: 60; top: 80%; transform: translateY(-100%); z-index:-1" />
+  <h1 style="display: inline-block;  font-size: 3em">RegisTrie</h1>
+</div>
+
+[![npm version](https://img.shields.io/npm/v/registrie.svg)](https://www.npmjs.com/package/registrie)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
 
 A flexible trie-based registry for storing and querying entries with optional hierarchical keys. `Registrie` supports both simple key-value stores and complex nested structures, making it a versatile tool for various applications.
 
@@ -63,18 +72,12 @@ const nestedRegistry = Registrie<Category>('name', 'subCategories');
 // Define categories
 const fruits: Category = {
   name: 'fruits',
-  subCategories: [
-    { name: 'apple' },
-    { name: 'banana' },
-  ],
+  subCategories: [{ name: 'apple' }, { name: 'banana' }]
 };
 
 const vegetables: Category = {
   name: 'vegetables',
-  subCategories: [
-    { name: 'carrot' },
-    { name: 'broccoli' },
-  ],
+  subCategories: [{ name: 'carrot' }, { name: 'broccoli' }]
 };
 
 // Register categories
@@ -93,6 +96,7 @@ console.log(nestedRegistry.candidate('fruits')); // Output: ['apple', 'banana']
 ### `BasicRegistrie<T = any>`
 
 #### `register(key: string, value: T, frozen?: boolean): void`
+
 Registers an entry in the registry.
 
 - `key`: The key to use for the entry.
@@ -100,16 +104,19 @@ Registers an entry in the registry.
 - `frozen`: If `true` (default), registers the entry as frozen (immutable).
 
 #### `query(key: string): T | undefined`
+
 Queries the registry for an entry by its key.
 
 - `key`: The key to search for in the registry.
 
 #### `candidate(key: string): string[]`
+
 Provides suggestions for a partial key input.
 
 - `key`: The partial key to use for suggestions.
 
 #### `erase(key: string): void`
+
 Erases an entry from the registry.
 
 - `key`: The key of the entry to remove.
@@ -117,22 +124,26 @@ Erases an entry from the registry.
 ### `NestedRegistrie<T extends object>`
 
 #### `register(value: T, frozen?: boolean): void`
+
 Registers a nested entry in the registry.
 
 - `value`: The entry to register.
 - `frozen`: If `true` (default), registers the entry as frozen (immutable).
 
 #### `query(key: string): T | undefined`
+
 Queries the registry for an entry by its key.
 
 - `key`: The key to search for in the registry.
 
 #### `candidate(key: string): Array<T[keyof T]>`
+
 Provides suggestions for a partial key input.
 
 - `key`: The partial key to use for suggestions.
 
 #### `erase(key: string): void`
+
 Erases an entry and its children from the registry.
 
 - `key`: The key of the entry to remove.
