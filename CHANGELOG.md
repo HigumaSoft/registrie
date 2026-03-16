@@ -1,5 +1,11 @@
 # registrie
 
+## 0.9.2
+
+### Patch Changes
+
+- test release pipeline
+
 ## 0.9.1
 
 ### Patch Changes
@@ -35,7 +41,6 @@
 ### Patch Changes
 
 - b52aba5: Add readme
-
   - Fixed the object children check, made it optional.
   - Added JSDoc to the returned methods (closures).
   - Added functionality to store objects as mutable or immutable.
@@ -66,7 +71,6 @@
 ### Minor Changes
 
 - 7d09f94: #### Key Changes:
-
   - **New Functionality**:
     - Introduced support for **typed registries** when `entryKey` and `childrenEntryKey` are provided, enforcing structure for objects.
     - Added recursive registration of entries with `addEntryT` that handles objects with `subCommands` (children).
@@ -92,7 +96,6 @@
     - Handled composed keys in both `candidateT` and `suggestionsT`, with recursion for deeper key structures.
 
   #### Miscellaneous:
-
   - **Improved Error Handling**: Errors are thrown if the entry type or structure does not match expectations (e.g., if `childrenEntryKey` is not an array).
   - **Refactoring**: Reduced redundancy in key traversal logic by centralizing shared functionality across both primitive and typed registries.
 

@@ -14,10 +14,13 @@ class RegistrieNode<T> {
 export type BasicRegistrie<T = unknown> = {
   /**
    * Registers an entry in the registry.
+   * If an entry already exists at the key, it is overwritten.
+   * Empty keys are not allowed and will throw.
    *
-   * @param key - The key to store the entry under.
+   * @param key - The key to store the entry under. Must be non-empty.
    * @param value - The value to store.
-   * @param frozen - If `true` (default), the value is frozen with `Object.freeze()`.
+   * @param frozen - If `true` (default), objects are frozen with `Object.freeze()`.
+   * @throws {Error} If key is empty.
    */
   register: (key: string, value: T, frozen?: boolean) => void;
   /**
@@ -28,12 +31,14 @@ export type BasicRegistrie<T = unknown> = {
   query: (key: string) => T | undefined;
   /**
    * Returns all keys that start with the given prefix, sorted alphabetically.
+   * Pass an empty string to get all registered keys.
    *
    * @param key - Prefix to search for.
    */
   candidate: (key: string) => string[];
   /**
    * Removes an entry from the registry and prunes any now-empty nodes.
+   * No-op if the key does not exist.
    *
    * @param key - The key of the entry to remove.
    */
@@ -44,9 +49,11 @@ export type NestedRegistrie<T extends object> = {
   /**
    * Registers an entry. The key is extracted from the object using `entryKey`.
    * If `childrenEntryKey` is set, children are registered recursively.
+   * If an entry already exists at the key, it is overwritten.
    *
    * @param value - The object to register.
-   * @param frozen - If `true` (default), the value is frozen with `Object.freeze()`.
+   * @param frozen - If `true` (default), objects are frozen with `Object.freeze()`.
+   * @throws {Error} If `entryKey` is missing from the value or children are not an array.
    */
   register: (value: T, frozen?: boolean) => void;
   /**
@@ -59,13 +66,16 @@ export type NestedRegistrie<T extends object> = {
   /**
    * Returns immediate child keys at the current path depth, sorted alphabetically.
    * Returns just the segment name, not the full path.
-   * Example: `candidate('fruits ')` returns `['apple', 'banana']`.
+   * Pass `'parent '` (with trailing space) to get children of 'parent'.
+   * Pass empty string to get all top-level keys.
    *
    * @param key - Prefix path to search under.
    */
   candidate: (key: string) => string[];
   /**
-   * Removes an entry and its entire subtree from the registry.
+   * Removes an entry and its logical children from the registry.
+   * Does not affect sibling entries that share a string prefix.
+   * No-op if the key does not exist.
    *
    * @param key - Space-delimited path of the entry to remove.
    */
@@ -182,6 +192,7 @@ function createBasicRegistrie<T>(): BasicRegistrie<T> {
 
   return {
     register(key: string, value: T, frozen = true): void {
+      if (!key) throw new Error("Key must be a non-empty string.");
       insertEntry(root, key, value, frozen);
     },
 
@@ -268,6 +279,8 @@ function createNestedRegistrie<T extends object>(
       const result = walkWithStack(root, key);
       if (!result || result.node.entry === EMPTY) return;
       result.node.entry = EMPTY;
+      // Only remove logical children (reachable via delimiter),
+      // not trie siblings that share a string prefix.
       delete result.node.children[DELIMITER];
       pruneUp(result.stack);
     },
@@ -293,6 +306,12 @@ export function Registrie<T extends object>(
  * - With `entryKey`: returns a `NestedRegistrie<T>` — a hierarchical registry where keys
  *   are extracted from the stored objects and children are registered recursively.
  *
+ * **Note on `frozen` (default: `true`):** By default, registered objects are frozen with
+ * `Object.freeze()`. This makes entries immutable after registration. Pass `frozen: false`
+ * to opt out.
+ *
+ * **Note on duplicate keys:** Registering the same key twice overwrites the previous entry.
+ *
  * @param entryKey - The property on `T` to use as the registry key.
  * @param childrenEntryKey - The property on `T` that holds an array of child entries.
  *
@@ -300,16 +319,25 @@ export function Registrie<T extends object>(
  * ```ts
  * const registry = Registrie<string>();
  * registry.register('apple', 'A fruit');
- * registry.query('apple'); // 'A fruit'
- * registry.candidate('ap'); // ['apple']
+ * registry.query('apple');     // 'A fruit'
+ * registry.candidate('ap');    // ['apple']
+ * registry.erase('apple');
+ * registry.query('apple');     // undefined
  * ```
  *
  * @example Nested usage
  * ```ts
- * const registry = Registrie<Category>('name', 'subCategories');
- * registry.register({ name: 'fruits', subCategories: [{ name: 'apple' }] });
- * registry.query('fruits apple'); // { name: 'apple' }
- * registry.candidate('fruits '); // ['apple']
+ * interface Category { name: string; children?: Category[] }
+ *
+ * const registry = Registrie<Category>('name', 'children');
+ * registry.register({
+ *   name: 'fruits',
+ *   children: [{ name: 'apple' }, { name: 'banana' }]
+ * });
+ * registry.query('fruits');          // { name: 'fruits', ... }
+ * registry.query('fruits apple');    // { name: 'apple' }
+ * registry.candidate('');            // ['fruits']
+ * registry.candidate('fruits ');     // ['apple', 'banana']
  * ```
  */
 export function Registrie<T>(entryKey?: keyof T, childrenEntryKey?: keyof T) {

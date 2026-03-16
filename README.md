@@ -1,151 +1,129 @@
-
 <div align="center">
 
 # RegisTrie
 
-[![npm version](https://img.shields.io/npm/v/registrie.svg)](https://www.npmjs.com/package/registrie)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/registrie.svg)](https://www.npmjs.com/package/registrie)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 </div>
 
-A flexible trie-based registry for storing and querying entries with optional hierarchical keys. `Registrie` supports both simple key-value stores and complex nested structures, making it a versatile tool for various applications.
+A trie-based registry for TypeScript/JavaScript. Supports both simple key-value storage and hierarchical nested structures with prefix-based autocomplete.
 
 ## Installation
-
-To install `Registrie` using npm:
 
 ```bash
 npm install registrie
 ```
 
-Or with yarn:
-
-```bash
-yarn add registrie
-```
-
 ## Usage
 
-`Registrie` can be used as either a simple key-value store or a more complex registry for nested entries.
-
-### Basic Example
-
-If no `entryKey` is provided, `Registrie` behaves as a simple key-value registry.
+### BasicRegistrie — simple key-value store
 
 ```typescript
 import { Registrie } from 'registrie';
 
-// Create a new registry
-const basicRegistry = Registrie<string>();
+const registry = Registrie<string>();
 
-// Register entries
-basicRegistry.register('apple', 'A tasty fruit');
-basicRegistry.register('banana', 'A yellow fruit');
+registry.register('apple', 'A tasty fruit');
+registry.register('banana', 'A yellow fruit');
+registry.register('apricot', 'An orange fruit');
 
-// Query entries
-console.log(basicRegistry.query('apple')); // Output: 'A tasty fruit'
+registry.query('apple');       // 'A tasty fruit'
+registry.query('cherry');      // undefined
 
-// Get suggestions for a partial key
-console.log(basicRegistry.candidate('b')); // Output: ['banana']
+registry.candidate('ap');      // ['apple', 'apricot']
+registry.candidate('b');       // ['banana']
+registry.candidate('');        // ['apple', 'apricot', 'banana']
 
-// Erase an entry
-basicRegistry.erase('apple');
-console.log(basicRegistry.query('apple')); // Output: undefined
+registry.erase('apple');
+registry.query('apple');       // undefined
 ```
 
-### Nested Example
+### NestedRegistrie — hierarchical store
 
-If `entryKey` is provided, `Registrie` supports nested structures. This is useful for managing hierarchical data where each entry has a key and potentially children.
+Keys are extracted from the objects themselves. Children are registered recursively.
 
 ```typescript
 import { Registrie } from 'registrie';
 
-interface Category {
+interface Command {
   name: string;
-  subCategories?: Category[];
+  description: string;
+  subCommands?: Command[];
 }
 
-// Create a nested registry
-const nestedRegistry = Registrie<Category>('name', 'subCategories');
+const registry = Registrie<Command>('name', 'subCommands');
 
-// Define categories
-const fruits: Category = {
-  name: 'fruits',
-  subCategories: [{ name: 'apple' }, { name: 'banana' }]
-};
+registry.register({
+  name: 'git',
+  description: 'Version control',
+  subCommands: [
+    { name: 'commit', description: 'Record changes' },
+    { name: 'push',   description: 'Upload changes' },
+  ]
+});
 
-const vegetables: Category = {
-  name: 'vegetables',
-  subCategories: [{ name: 'carrot' }, { name: 'broccoli' }]
-};
+registry.query('git');           // { name: 'git', ... }
+registry.query('git commit');    // { name: 'commit', ... }
+registry.query('git pull');      // undefined
 
-// Register categories
-nestedRegistry.register(fruits);
-nestedRegistry.register(vegetables);
+// Pass a trailing space to get children of a node
+registry.candidate('');          // ['git']
+registry.candidate('git ');      // ['commit', 'push']
 
-// Query entries
-console.log(nestedRegistry.query('fruits apple')); // Output: { name: 'apple' }
-
-// Get suggestions
-console.log(nestedRegistry.candidate('fruits')); // Output: ['apple', 'banana']
+registry.erase('git');
+registry.query('git');           // undefined
+registry.query('git commit');    // undefined
 ```
 
 ## API
 
-### `BasicRegistrie<T = any>`
+### `Registrie<T>(entryKey?, childrenEntryKey?)`
 
-#### `register(key: string, value: T, frozen?: boolean): void`
+Factory function. Returns a `BasicRegistrie<T>` or `NestedRegistrie<T>` depending on arguments.
 
-Registers an entry in the registry.
+| Arguments | Returns |
+|-----------|---------|
+| none | `BasicRegistrie<T>` |
+| `entryKey` | `NestedRegistrie<T>` |
+| `entryKey, childrenEntryKey` | `NestedRegistrie<T>` with recursive children |
 
-- `key`: The key to use for the entry.
-- `value`: The entry to register.
-- `frozen`: If `true` (default), registers the entry as frozen (immutable).
+### `BasicRegistrie<T>`
 
-#### `query(key: string): T | undefined`
-
-Queries the registry for an entry by its key.
-
-- `key`: The key to search for in the registry.
-
-#### `candidate(key: string): string[]`
-
-Provides suggestions for a partial key input.
-
-- `key`: The partial key to use for suggestions.
-
-#### `erase(key: string): void`
-
-Erases an entry from the registry.
-
-- `key`: The key of the entry to remove.
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `register` | `(key: string, value: T, frozen?: boolean) => void` | Store an entry. Overwrites if key exists. Throws on empty key. |
+| `query` | `(key: string) => T \| undefined` | Exact key lookup. |
+| `candidate` | `(key: string) => string[]` | All keys with given prefix, sorted. |
+| `erase` | `(key: string) => void` | Remove an entry. No-op if not found. |
 
 ### `NestedRegistrie<T extends object>`
 
-#### `register(value: T, frozen?: boolean): void`
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `register` | `(value: T, frozen?: boolean) => void` | Store an entry, key extracted from object. Overwrites if key exists. |
+| `query` | `(key: string) => T \| undefined` | Space-delimited path lookup. |
+| `candidate` | `(key: string) => string[]` | Immediate child keys at current depth, sorted. Pass trailing space to get children. |
+| `erase` | `(key: string) => void` | Remove entry and its logical children. No-op if not found. |
 
-Registers a nested entry in the registry.
+## Notes
 
-- `value`: The entry to register.
-- `frozen`: If `true` (default), registers the entry as frozen (immutable).
+**`frozen` defaults to `true`**
+By default, registered objects are frozen with `Object.freeze()` making them immutable after registration. Pass `frozen: false` to opt out:
+```typescript
+registry.register('key', value, false);
+```
 
-#### `query(key: string): T | undefined`
+**Duplicate keys**
+Registering the same key twice silently overwrites the previous entry.
 
-Queries the registry for an entry by its key.
-
-- `key`: The key to search for in the registry.
-
-#### `candidate(key: string): Array<T[keyof T]>`
-
-Provides suggestions for a partial key input.
-
-- `key`: The partial key to use for suggestions.
-
-#### `erase(key: string): void`
-
-Erases an entry and its children from the registry.
-
-- `key`: The key of the entry to remove.
+**`candidate()` in NestedRegistrie**
+To get children of a node, include a trailing space in the key:
+```typescript
+registry.candidate('git ');   // children of 'git' → ['commit', 'push']
+registry.candidate('git');    // entries with prefix 'git' → ['git']
+```
 
 ## License
 
-MIT License © [Higuma Soft](https://github.com/HigumaSoft)
+MIT © [Higuma Soft](https://github.com/HigumaSoft)

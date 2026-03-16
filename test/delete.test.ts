@@ -91,3 +91,19 @@ describe("NestedRegistrie — erase", () => {
     expect(() => registry.erase("")).not.toThrow();
   });
 });
+
+describe("BasicRegistrie — register edge cases", () => {
+  it("throws on empty key", () => {
+    const registry = Registrie();
+    expect(() => registry.register("", "value")).toThrow(
+      "Key must be a non-empty string.",
+    );
+  });
+
+  it("overwrites existing entry on duplicate key", () => {
+    const registry = Registrie<string>();
+    registry.register("apple", "first", false);
+    registry.register("apple", "second", false);
+    expect(registry.query("apple")).toBe("second");
+  });
+});
