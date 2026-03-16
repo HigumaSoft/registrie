@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach,describe, expect, it } from 'vitest';
+
 import { Registrie } from '../src/registrie';
 import {
-  mockDataWithChildren,
+  type EntryObjectWithChildren,
   mockDataAny,
-  EntryObjectWithChildren
-} from './mock-data';
+  mockDataWithChildren} from './mock-data';
 
 describe('Suggestions test', () => {
   // Test for mockDataWithChildren

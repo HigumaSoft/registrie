@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'; // or 'jest'
-import { BasicRegistrie, NestedRegistrie, Registrie } from '../src/registrie'; // Adjust the import to your file structure
+import { beforeEach,describe, expect, it } from 'vitest'; // or 'jest'
+
+import { type BasicRegistrie, type NestedRegistrie, Registrie } from '../src/registrie'; // Adjust the import to your file structure
 import {
-  mockDataWithChildren,
+  type EntryObjectWithChildren,
   mockDataAny,
-  EntryObjectWithChildren
-} from './mock-data'; // Adjust import as necessary
+  mockDataWithChildren} from './mock-data'; // Adjust import as necessary
 
 describe('Query method tests', () => {
   // Test for mockDataWithChildren

@@ -1,1 +1,1 @@
-export * from './registrie';
+export * from './registrie.js';

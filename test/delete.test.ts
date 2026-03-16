@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { BasicRegistrie, Registrie } from '../src/registrie';
+
+import { type BasicRegistrie, Registrie } from '../src/registrie';
 import { mockDataAny } from './mock-data';
 
 describe('Query method tests', () => {
