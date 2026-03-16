@@ -1,7 +1,7 @@
 // Sentinel used to distinguish "no entry" from a stored `undefined` value.
-const EMPTY = Symbol('EMPTY');
+const EMPTY = Symbol("EMPTY");
 
-const DELIMITER = ' ';
+const DELIMITER = " ";
 
 class RegistrieNode<T> {
   public children: Record<string, RegistrieNode<T>> = {};
@@ -74,7 +74,10 @@ export type NestedRegistrie<T extends object> = {
 
 // — Shared trie helpers —
 
-function getNode<T>(root: RegistrieNode<T>, key: string): RegistrieNode<T> | undefined {
+function getNode<T>(
+  root: RegistrieNode<T>,
+  key: string,
+): RegistrieNode<T> | undefined {
   let node: RegistrieNode<T> = root;
   for (const char of key) {
     const next = node.children[char];
@@ -84,7 +87,12 @@ function getNode<T>(root: RegistrieNode<T>, key: string): RegistrieNode<T> | und
   return node;
 }
 
-function insertEntry<T>(root: RegistrieNode<T>, key: string, value: T, frozen: boolean): void {
+function insertEntry<T>(
+  root: RegistrieNode<T>,
+  key: string,
+  value: T,
+  frozen: boolean,
+): void {
   let node: RegistrieNode<T> = root;
   for (const char of key) {
     if (!node.children[char]) {
@@ -93,7 +101,7 @@ function insertEntry<T>(root: RegistrieNode<T>, key: string, value: T, frozen: b
     node = node.children[char] as RegistrieNode<T>;
   }
   node.entry =
-    frozen && typeof value === 'object' && value !== null
+    frozen && typeof value === "object" && value !== null
       ? Object.freeze(value)
       : value;
 }
@@ -112,8 +120,10 @@ function pruneUp<T>(stack: Array<[RegistrieNode<T>, string]>): void {
 
 function walkWithStack<T>(
   root: RegistrieNode<T>,
-  key: string
-): { node: RegistrieNode<T>; stack: Array<[RegistrieNode<T>, string]> } | undefined {
+  key: string,
+):
+  | { node: RegistrieNode<T>; stack: Array<[RegistrieNode<T>, string]> }
+  | undefined {
   let node: RegistrieNode<T> = root;
   const stack: Array<[RegistrieNode<T>, string]> = [];
   for (const char of key) {
@@ -129,19 +139,25 @@ function collectAllKeys<T>(node: RegistrieNode<T>, prefix: string): string[] {
   const list: string[] = [];
   if (node.entry !== EMPTY) list.push(prefix);
   for (const char in node.children) {
-    list.push(...collectAllKeys(node.children[char] as RegistrieNode<T>, prefix + char));
+    list.push(
+      ...collectAllKeys(node.children[char] as RegistrieNode<T>, prefix + char),
+    );
   }
   return list;
 }
 
-function collectChildSegments<T>(node: RegistrieNode<T>, fullPrefix: string): string[] {
+function collectChildSegments<T>(
+  node: RegistrieNode<T>,
+  fullPrefix: string,
+): string[] {
   const list: string[] = [];
 
   for (const [char, childNode] of Object.entries(node.children)) {
     if (char === DELIMITER) {
       // Delimiter marks the end of a complete segment — extract and return it
       const lastDelim = fullPrefix.lastIndexOf(DELIMITER);
-      const segment = lastDelim === -1 ? fullPrefix : fullPrefix.slice(lastDelim + 1);
+      const segment =
+        lastDelim === -1 ? fullPrefix : fullPrefix.slice(lastDelim + 1);
       list.push(segment);
     } else {
       list.push(...collectChildSegments(childNode, fullPrefix + char));
@@ -151,7 +167,8 @@ function collectChildSegments<T>(node: RegistrieNode<T>, fullPrefix: string): st
   // Leaf node with an entry — return its segment
   if (Object.keys(node.children).length === 0 && node.entry !== EMPTY) {
     const lastDelim = fullPrefix.lastIndexOf(DELIMITER);
-    const segment = lastDelim === -1 ? fullPrefix : fullPrefix.slice(lastDelim + 1);
+    const segment =
+      lastDelim === -1 ? fullPrefix : fullPrefix.slice(lastDelim + 1);
     list.push(segment);
   }
 
@@ -191,22 +208,26 @@ function createBasicRegistrie<T>(): BasicRegistrie<T> {
 
 function createNestedRegistrie<T extends object>(
   entryKey: keyof T,
-  childrenEntryKey?: keyof T
+  childrenEntryKey?: keyof T,
 ): NestedRegistrie<T> {
   const root = new RegistrieNode<T>();
 
   function validate(value: T): void {
-    if (typeof value !== 'object' || value === null) {
-      throw new Error('The provided value must be an object if entryKey is set.');
+    if (typeof value !== "object" || value === null) {
+      throw new Error(
+        "The provided value must be an object if entryKey is set.",
+      );
     }
     if (!(entryKey in value)) {
-      throw new Error(`The entryKey "${String(entryKey)}" is not present in the object.`);
+      throw new Error(
+        `The entryKey "${String(entryKey)}" is not present in the object.`,
+      );
     }
     if (childrenEntryKey && childrenEntryKey in value) {
       const children = value[childrenEntryKey];
       if (!Array.isArray(children)) {
         throw new Error(
-          `The childrenEntryKey "${String(childrenEntryKey)}" must be an array.`
+          `The childrenEntryKey "${String(childrenEntryKey)}" must be an array.`,
         );
       }
       for (const child of children as T[]) {
@@ -215,7 +236,7 @@ function createNestedRegistrie<T extends object>(
     }
   }
 
-  function insertRecursive(value: T, frozen: boolean, prefix = ''): void {
+  function insertRecursive(value: T, frozen: boolean, prefix = ""): void {
     const key = `${prefix}${String(value[entryKey])}`;
     insertEntry(root, key, value, frozen);
     if (childrenEntryKey && value[childrenEntryKey]) {
@@ -247,7 +268,7 @@ function createNestedRegistrie<T extends object>(
       const result = walkWithStack(root, key);
       if (!result || result.node.entry === EMPTY) return;
       result.node.entry = EMPTY;
-      result.node.children = {};
+      delete result.node.children[DELIMITER];
       pruneUp(result.stack);
     },
   };
@@ -257,12 +278,12 @@ function createNestedRegistrie<T extends object>(
 
 export function Registrie<T = unknown>(
   entryKey?: undefined,
-  childrenEntryKey?: undefined
+  childrenEntryKey?: undefined,
 ): BasicRegistrie<T>;
 
 export function Registrie<T extends object>(
   entryKey: keyof T,
-  childrenEntryKey?: keyof T
+  childrenEntryKey?: keyof T,
 ): NestedRegistrie<T>;
 
 /**
@@ -295,7 +316,7 @@ export function Registrie<T>(entryKey?: keyof T, childrenEntryKey?: keyof T) {
   if (entryKey) {
     return createNestedRegistrie<T & object>(
       entryKey as keyof (T & object),
-      childrenEntryKey as keyof (T & object) | undefined
+      childrenEntryKey as keyof (T & object) | undefined,
     );
   }
   return createBasicRegistrie<T>();

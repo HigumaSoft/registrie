@@ -1,44 +1,93 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { type BasicRegistrie, Registrie } from "../src/registrie.js";
-import { mockDataAny } from "./mock-data.js";
+import {
+  type BasicRegistrie,
+  type NestedRegistrie,
+  Registrie,
+} from "../src/registrie.js";
+import {
+  type EntryObjectWithChildren,
+  mockDataAny,
+  mockDataWithChildren,
+} from "./mock-data.js";
 
-describe("Query method tests", () => {
-  describe("Test for Registrie with any data type", () => {
-    let registryWithAny: BasicRegistrie;
+describe("BasicRegistrie — erase", () => {
+  let registry: BasicRegistrie;
 
-    beforeEach(() => {
-      registryWithAny = Registrie();
+  beforeEach(() => {
+    registry = Registrie();
+    Object.entries(mockDataAny).forEach(([key, value]) =>
+      registry.register(key, value),
+    );
+  });
 
-      Object.entries(mockDataAny).forEach(([key, value]) =>
-        registryWithAny.register(key, value),
-      );
-    });
+  it("removes an entry", () => {
+    registry.erase("object");
+    expect(registry.query("object")).toBeUndefined();
+  });
 
-    // New test for deletion of "number string"
-    it('should delete "number string" and still return correct object for "number"', () => {
-      // Delete the "number string" entry
-      registryWithAny.erase("number string");
+  it("does not affect sibling keys with shared prefix", () => {
+    registry.erase("number string");
+    expect(registry.query("number string")).toBeUndefined();
+    expect(registry.query("number")).toEqual(mockDataAny.number);
+  });
 
-      // Query for "number string" should return undefined after deletion
-      const deletedResult = registryWithAny.query("number string");
-      expect(deletedResult).toBeUndefined();
+  it("does not throw on non-existent key", () => {
+    expect(() => registry.erase("does-not-exist")).not.toThrow();
+  });
 
-      // Query for "number" should still return the correct value
-      const numberResult = registryWithAny.query("number");
-      expect(numberResult).toEqual(mockDataAny.number);
-    });
+  it("does not throw on empty key", () => {
+    expect(() => registry.erase("")).not.toThrow();
+  });
 
-    it("should delete object", () => {
-      registryWithAny.erase("object");
-      const result = registryWithAny.query("object");
-      expect(result).toBeUndefined();
-    });
+  it("removed key no longer appears in candidate results", () => {
+    registry.erase("object");
+    expect(registry.candidate("ob")).toEqual([]);
+  });
 
-    it("should not delete array", () => {
-      registryWithAny.erase("arr");
-      const result = registryWithAny.query("array");
-      expect(result).toEqual(mockDataAny.array);
-    });
+  it("does not remove a key that only partially matches", () => {
+    registry.erase("arr");
+    expect(registry.query("array")).toEqual(mockDataAny.array);
+  });
+});
+
+describe("NestedRegistrie — erase", () => {
+  let registry: NestedRegistrie<EntryObjectWithChildren>;
+
+  beforeEach(() => {
+    registry = Registrie<EntryObjectWithChildren>("usage", "subCommands");
+    mockDataWithChildren.forEach((entry) => registry.register(entry));
+  });
+
+  it("removes a top-level entry", () => {
+    registry.erase("font");
+    expect(registry.query("font")).toBeUndefined();
+  });
+
+  it("removing a top-level entry also removes its subtree", () => {
+    registry.erase("color");
+    expect(registry.query("color")).toBeUndefined();
+    expect(registry.query("color red")).toBeUndefined();
+    expect(registry.query("color green")).toBeUndefined();
+    expect(registry.query("color green dark")).toBeUndefined();
+  });
+
+  it("removes a nested entry without affecting the parent", () => {
+    registry.erase("color green");
+    expect(registry.query("color green")).toBeUndefined();
+    expect(registry.query("color")).toBeDefined();
+  });
+
+  it("removed entry no longer appears in candidate results", () => {
+    registry.erase("color");
+    expect(registry.candidate("")).toEqual(["color-mix", "font"]);
+  });
+
+  it("does not throw on non-existent key", () => {
+    expect(() => registry.erase("does-not-exist")).not.toThrow();
+  });
+
+  it("does not throw on empty key", () => {
+    expect(() => registry.erase("")).not.toThrow();
   });
 });
