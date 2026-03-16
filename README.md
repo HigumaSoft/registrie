@@ -4,6 +4,8 @@
 
 [![npm version](https://img.shields.io/npm/v/registrie.svg)](https://www.npmjs.com/package/registrie)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/HigumaSoft/registrie/actions/workflows/publish.yml/badge.svg)](https://github.com/HigumaSoft/registrie/actions/workflows/publish.yml)
+
 
 </div>
 

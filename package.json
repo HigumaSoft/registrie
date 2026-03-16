@@ -1,6 +1,6 @@
 {
   "name": "registrie",
-  "version": "0.9.2",
+  "version": "1.0.0",
   "description": "A flexible trie-based registry for storing and querying entries with optional hierarchical keys. `Registrie` supports both simple key-value stores and complex nested structures, making it a versatile tool for various applications.",
   "author": "Higuma Soft",
   "license": "MIT",
@@ -38,7 +38,9 @@
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
   ],
   "sideEffects": false,
   "scripts": {
